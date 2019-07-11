@@ -30,4 +30,5 @@ sealed class SyftMessage {
 
 sealed class SyftCommand {
     data class Add(val tensors: List<SyftOperand>, val resultIds: List<SyftTensorId>) : SyftCommand()
+    data class Multiply(val tensors: List<SyftOperand>, val resultIds: List<SyftTensorId>) : SyftCommand()
 }

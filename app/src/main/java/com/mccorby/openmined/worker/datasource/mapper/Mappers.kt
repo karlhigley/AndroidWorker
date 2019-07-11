@@ -1,6 +1,7 @@
 package com.mccorby.openmined.worker.datasource.mapper
 
 import com.mccorby.openmined.worker.datasource.mapper.CommandConstants.CMD_ADD
+import com.mccorby.openmined.worker.datasource.mapper.CommandConstants.CMD_MULTIPLY
 import com.mccorby.openmined.worker.datasource.mapper.CompressionConstants.COMPRESSION_ENABLED
 import com.mccorby.openmined.worker.datasource.mapper.OperationConstants.CMD
 import com.mccorby.openmined.worker.datasource.mapper.OperationConstants.FORCE_OBJ_DEL
@@ -43,21 +44,21 @@ internal object OperationConstants {
 
 // Types are encoded in the stream sent from PySyft
 internal object TypeConstants {
-    const val TYPE_TENSOR = 0
     const val TYPE_TUPLE = 2
     const val TYPE_LIST = 3
-    const val TYPE_TENSOR_POINTER = 11
+    const val TYPE_TENSOR = 12
+    const val TYPE_TENSOR_POINTER = 18
 }
 
 // Commands
 internal object CommandConstants {
     const val CMD_ADD = "__add__"
+    const val CMD_MULTIPLY = "__mul__"
 }
 
 // TODO Probably Json or something similar. The name should reflect the format
 fun SyftMessage.mapToString(): String {
     val packer = MessagePack.newDefaultBufferPacker()
-    // TODO packer.packBlahBlahBlha
     return when (this) {
         is SyftMessage.OperationAck -> packer.packString(SyftMessage.OperationAck.toString())
         else -> {
@@ -168,6 +169,22 @@ fun unpackCommand(operands: Value): OperationDto {
             operationDto.returnId = returnIds[1].asArrayValue().map { it.asNumberValue().toLong() }
             operationDto
         }
+        CMD_MULTIPLY -> {
+            val operationDto = OperationDto(op = CMD, command = command)
+            val tensorList = mutableListOf<OperandDto>()
+            val op1 = operation[1].asArrayValue()
+            val op2 = operation[2].asArrayValue()[1]
+            tensorList.add(unpackOperandByType(op1))
+
+            op2.asArrayValue().map {
+                val operand = unpackOperandByType(it.asArrayValue())
+                tensorList.add(operand)
+            }
+
+            operationDto.value = tensorList.toList()
+            operationDto.returnId = returnIds[1].asArrayValue().map { it.asNumberValue().toLong() }
+            operationDto
+        }
         else -> {
             TODO("$command not yet implemented!")
         }
@@ -229,7 +246,8 @@ private fun mapOperation(operationDto: OperationDto): SyftMessage {
             val listOfSyftOperands = operationDto.value.map {
                 mapOperandToDomain(it)
             }
-            SyftMessage.ExecuteCommand(SyftCommand.Add(listOfSyftOperands, operationDto.returnId))
+            val command = createCommandMessage(operationDto.command, listOfSyftOperands, operationDto.returnId)
+            SyftMessage.ExecuteCommand(command)
         }
         OBJ_DEL, FORCE_OBJ_DEL -> {
             SyftMessage.DeleteObject((operationDto.value[0] as OperandDto.TensorPointerDto).id)
@@ -239,6 +257,20 @@ private fun mapOperation(operationDto: OperationDto): SyftMessage {
         }
         else -> {
             throw IllegalArgumentException("Operation ${operationDto.op} not yet supported")
+        }
+    }
+}
+
+private fun createCommandMessage(command: String, listOfSyftOperands: List<SyftOperand>, returnId: List<Long>): SyftCommand {
+    return when (command) {
+        CMD_ADD -> {
+            SyftCommand.Add(listOfSyftOperands, returnId)
+        }
+        CMD_MULTIPLY -> {
+            SyftCommand.Multiply(listOfSyftOperands, returnId)
+        }
+        else -> {
+            TODO("Command $command not yet implemented")
         }
     }
 }

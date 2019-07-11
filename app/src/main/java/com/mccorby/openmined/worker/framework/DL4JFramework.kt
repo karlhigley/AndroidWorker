@@ -32,4 +32,8 @@ class DL4JFramework : MLFramework {
     override fun add(tensor1: SyftOperand.SyftTensor, tensor2: SyftOperand.SyftTensor): SyftOperand.SyftTensor {
         return tensor1.toINDArray().add(tensor2.toINDArray()).toSyftTensor()
     }
+
+    override fun multiply(tensor1: SyftOperand.SyftTensor, tensor2: SyftOperand.SyftTensor): SyftOperand.SyftTensor {
+        return tensor1.toINDArray().mul(tensor2.toINDArray()).toSyftTensor()
+    }
 }
