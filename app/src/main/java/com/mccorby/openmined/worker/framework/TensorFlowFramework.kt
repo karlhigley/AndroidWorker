@@ -5,6 +5,10 @@ import com.mccorby.openmined.worker.domain.SyftOperand
 
 class TensorFlowFramework : MLFramework {
 
+    override fun multiply(tensor1: SyftOperand.SyftTensor, tensor2: SyftOperand.SyftTensor): SyftOperand.SyftTensor {
+        TODO("not implemented")
+    }
+
     override fun add(tensor1: SyftOperand.SyftTensor, tensor2: SyftOperand.SyftTensor): SyftOperand.SyftTensor {
         TODO("not implemented")
         // // Let's say graph is an instance of the Graph class
