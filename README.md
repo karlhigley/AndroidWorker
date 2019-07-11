@@ -11,7 +11,7 @@ The Android Worker is an app that connects to a PySyft worker and performs the o
 ## Quick start
 
 * Start the socket server
-  * There is an example provided in the code: `socketio_server_demo.py`
+  * There is an example provided in the code of Grid: `socketio_server_demo.py`
 * Start a Jupyter notebook and create a `WebsocketIOClientWorker` object.
   * Note that you need to provide strategies for serialization and compression
   * See the example `examples/experimental/Sockets/Socket%20Bob.ipynb`
@@ -19,11 +19,11 @@ The Android Worker is an app that connects to a PySyft worker and performs the o
 * Execute the operations in the notebook and see how Android handles them!
 
 #### Notes
-* The project is still in an early stage and only some PySyft operations are implemented: `send`, `get`, `add`, `delete`
+* The project is still in an early stage and only some PySyft operations are implemented: `send`, `get`, `add`, `delete`, `mul`
 * Make sure the socket server, the client in the notebook and the app all point to the same host/port
 * To run the setup locally, it is better to use an Android emulator
 
 ## PySfyt Version
-This app has been tested with PySyft 0.1.13a1
+This app has been tested with PySyft 0.1.19a1
 
 
