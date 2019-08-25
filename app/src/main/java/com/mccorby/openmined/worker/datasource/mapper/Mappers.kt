@@ -244,7 +244,11 @@ private fun mapOperation(operationDto: OperationDto): SyftMessage {
             val listOfSyftOperands = operationDto.value.map {
                 mapOperandToDomain(it)
             }
-            val command = createCommandMessage(operationDto.command, listOfSyftOperands, operationDto.returnId)
+            val command = createCommandMessage(
+                operationDto.command,
+                listOfSyftOperands,
+                operationDto.returnId
+            )
             SyftMessage.ExecuteCommand(command)
         }
         OBJ_DEL, FORCE_OBJ_DEL -> {
@@ -259,7 +263,11 @@ private fun mapOperation(operationDto: OperationDto): SyftMessage {
     }
 }
 
-private fun createCommandMessage(command: String, listOfSyftOperands: List<SyftOperand>, returnId: List<Long>): SyftCommand {
+private fun createCommandMessage(
+    command: String,
+    listOfSyftOperands: List<SyftOperand>,
+    returnId: List<Long>
+): SyftCommand {
     return when (command) {
         CMD_ADD -> {
             SyftCommand.Add(listOfSyftOperands, returnId)
