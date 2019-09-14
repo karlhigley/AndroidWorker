@@ -31,23 +31,19 @@ internal object CompressionConstants {
 
 // Operations in PySyft
 internal object OperationConstants {
-    internal const val CMD = 1
-    internal const val OBJ = 2
-    internal const val OBJ_REQ = 3
+    internal const val CMD = 26
+    internal const val OBJ = 27
+    internal const val OBJ_REQ = 28
     internal const val OBJ_DEL = 4
-    internal const val EXCEPTION = 5
-    internal const val IS_NONE = 6
-    internal const val GET_SHAPE = 7
-    internal const val SEARCH = 8
-    internal const val FORCE_OBJ_DEL = 9
+    internal const val FORCE_OBJ_DEL = 31
 }
 
 // Types are encoded in the stream sent from PySyft
 internal object TypeConstants {
-    const val TYPE_TUPLE = 2
-    const val TYPE_LIST = 3
-    const val TYPE_TENSOR = 12
-    const val TYPE_TENSOR_POINTER = 18
+    const val TYPE_TUPLE = 6
+    const val TYPE_LIST = 1
+    const val TYPE_TENSOR = 13
+    const val TYPE_TENSOR_POINTER = 20
 }
 
 // Commands
@@ -105,7 +101,7 @@ fun ByteArray.mapToSyftMessage(): SyftMessage {
 
     val unpacker = MessagePack.newDefaultUnpacker(byteArray)
     val streamToDecode = unpacker.unpackValue()
-    val operationDto = unpackOperation(streamToDecode.asArrayValue()[1].asArrayValue())
+    val operationDto = unpackOperation(streamToDecode.asArrayValue())
 
     return mapOperation(operationDto)
 }
@@ -125,7 +121,8 @@ private fun unpackOperation(operationArray: ArrayValue): OperationDto {
 }
 
 private fun unpackObjectSet(operands: Value): OperationDto {
-    val data = unpackOperandByType(operands as ArrayValue)
+    val operandList = (operands as ArrayValue)[1].asArrayValue()
+    val data = unpackOperandByType(operandList)
     return OperationDto(OBJ, "", listOf(data))
 }
 
@@ -137,7 +134,8 @@ private fun unpackObjectDelete(operands: Value): OperationDto {
 }
 
 fun unpackObjectRequest(operands: Value): OperationDto {
-    val operand = operands.asNumberValue().toLong()
+    // [3,77063181507]
+    val operand = operands.asArrayValue()[1].asNumberValue().toLong()
     val pointerDto = OperandDto.TensorPointerDto()
     pointerDto.id = operand
     return OperationDto(OBJ_REQ, value = listOf((pointerDto)))
@@ -166,7 +164,7 @@ fun unpackCommand(operands: Value): OperationDto {
             }
 
             operationDto.value = tensorList.toList()
-            operationDto.returnId = returnIds[1].asArrayValue().map { it.asNumberValue().toLong() }
+            operationDto.returnId = listOf(returnIds[0].asNumberValue().toLong())
             operationDto
         }
         CMD_MULTIPLY -> {
@@ -246,7 +244,11 @@ private fun mapOperation(operationDto: OperationDto): SyftMessage {
             val listOfSyftOperands = operationDto.value.map {
                 mapOperandToDomain(it)
             }
-            val command = createCommandMessage(operationDto.command, listOfSyftOperands, operationDto.returnId)
+            val command = createCommandMessage(
+                operationDto.command,
+                listOfSyftOperands,
+                operationDto.returnId
+            )
             SyftMessage.ExecuteCommand(command)
         }
         OBJ_DEL, FORCE_OBJ_DEL -> {
@@ -261,7 +263,11 @@ private fun mapOperation(operationDto: OperationDto): SyftMessage {
     }
 }
 
-private fun createCommandMessage(command: String, listOfSyftOperands: List<SyftOperand>, returnId: List<Long>): SyftCommand {
+private fun createCommandMessage(
+    command: String,
+    listOfSyftOperands: List<SyftOperand>,
+    returnId: List<Long>
+): SyftCommand {
     return when (command) {
         CMD_ADD -> {
             SyftCommand.Add(listOfSyftOperands, returnId)
