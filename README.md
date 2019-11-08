@@ -10,13 +10,18 @@ The Android Worker is an app that connects to a PySyft worker and performs the o
 
 ## Quick start
 
+* Start the Android application
 * Start the socket server
-  * There is an example provided in the code of Grid: `socketio_server_demo.py`
+  * There is an example provided in the code of Grid: [`socketio_server_demo.py`](https://github.com/OpenMined/PyGrid/blob/dev/examples/android/socketio_server_demo.py)
+* Start the socketio client
+  * See the example [`Android Proxy.ipynb`](https://github.com/OpenMined/PyGrid/blob/dev/examples/android/Android%20Proxy.ipynb)
 * Start a Jupyter notebook and create a `WebsocketIOClientWorker` object.
   * Note that you need to provide strategies for serialization and compression
-  * See the example `examples/experimental/Sockets/Socket%20Bob.ipynb`
-* Run the app
+  * See the example [`Socket Bob.ipynb`](https://github.com/OpenMined/PyGrid/blob/dev/examples/android/Socket%20Bob.ipynb)
+* Connect the socketio client (Bob)
+* Connect the Android app
 * Execute the operations in the notebook and see how Android handles them!
+
 
 #### Notes
 * The project is still in an early stage and only some PySyft operations are implemented: `send`, `get`, `add`, `delete`, `mul`
