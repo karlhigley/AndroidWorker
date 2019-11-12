@@ -44,8 +44,11 @@ class SyftWebSocketDataSource(private val webSocketUrl: String, private val clie
         socket.connect()
     }
 
-    private fun logError(args: Array<Any>) {
-        args.forEach { print(" $it") }
+    private fun logError(args: Array<Any>): String {
+        return args.map {
+            val ex: Exception = it as Exception
+            "$ex, with cause: ${ex.cause}"
+        }.joinToString("\n")
     }
 
     override fun onStatusChanged(): Flowable<String> = statusPublishProcessor.onBackpressureBuffer()
