@@ -31,19 +31,19 @@ internal object CompressionConstants {
 
 // Operations in PySyft
 internal object OperationConstants {
-    internal const val CMD = 26
-    internal const val OBJ = 27
-    internal const val OBJ_REQ = 28
+    internal const val CMD = 33
+    internal const val OBJ = 34
+    internal const val OBJ_REQ = 35
     internal const val OBJ_DEL = 4
-    internal const val FORCE_OBJ_DEL = 31
+    internal const val FORCE_OBJ_DEL = 38
 }
 
 // Types are encoded in the stream sent from PySyft
 internal object TypeConstants {
     const val TYPE_TUPLE = 6
     const val TYPE_LIST = 1
-    const val TYPE_TENSOR = 13
-    const val TYPE_TENSOR_POINTER = 20
+    const val TYPE_TENSOR = 14
+    const val TYPE_TENSOR_POINTER = 25
 }
 
 // Commands

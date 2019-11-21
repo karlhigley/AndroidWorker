@@ -30,6 +30,6 @@ The Android Worker is an app that connects to a PySyft worker and performs the o
 * To run the setup locally, it is better to use an Android emulator
 
 ## PySfyt Version
-This app has been tested with PySyft 0.1.25a and PyGrid commit 694c01d1ecebfa891ef443e68594f07dd382abff
+This app has been tested with PySyft 0.2.0a2 and PyGrid commit 8f990d9790899c87323a9dc82381b8811439f809
 
 
