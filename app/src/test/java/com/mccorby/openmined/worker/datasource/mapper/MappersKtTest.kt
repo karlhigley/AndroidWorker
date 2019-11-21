@@ -105,15 +105,15 @@ class MappersKtTest {
     }
 
     @Test
-    fun `Given a msgpack byte array containing an Delete operation the mapper returns the corresponding SyftMessage`() {
-        // [4,93504664205]
+    fun `Given a msgpack byte array containing a ForceDelete operation the mapper returns the corresponding SyftMessage`() {
+        // [38,93504664205]
         // Given
         val pointerId = 1234L
         val expected = SyftMessage.DeleteObject(pointerId)
 
         val operation = ImmutableArrayValueImpl(
             arrayOf<Value>(
-                ImmutableLongValueImpl(OperationConstants.OBJ_DEL.toLong()), // This corresponds to Mappers.OBJ_DEL
+                ImmutableLongValueImpl(OperationConstants.FORCE_OBJ_DEL.toLong()),
                 ImmutableLongValueImpl(pointerId)
             )
         )
