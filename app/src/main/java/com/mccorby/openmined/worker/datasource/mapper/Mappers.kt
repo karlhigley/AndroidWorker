@@ -6,7 +6,6 @@ import com.mccorby.openmined.worker.datasource.mapper.CompressionConstants.COMPR
 import com.mccorby.openmined.worker.datasource.mapper.OperationConstants.CMD
 import com.mccorby.openmined.worker.datasource.mapper.OperationConstants.FORCE_OBJ_DEL
 import com.mccorby.openmined.worker.datasource.mapper.OperationConstants.OBJ
-import com.mccorby.openmined.worker.datasource.mapper.OperationConstants.OBJ_DEL
 import com.mccorby.openmined.worker.datasource.mapper.OperationConstants.OBJ_REQ
 import com.mccorby.openmined.worker.datasource.mapper.TypeConstants.TYPE_TENSOR
 import com.mccorby.openmined.worker.datasource.mapper.TypeConstants.TYPE_TENSOR_POINTER
@@ -34,7 +33,6 @@ internal object OperationConstants {
     internal const val CMD = 33
     internal const val OBJ = 34
     internal const val OBJ_REQ = 35
-    internal const val OBJ_DEL = 4
     internal const val FORCE_OBJ_DEL = 38
 }
 
@@ -112,7 +110,7 @@ private fun unpackOperation(operationArray: ArrayValue): OperationDto {
     return when (operation) {
         OBJ -> unpackObjectSet(operands)
         CMD -> unpackCommand(operands)
-        OBJ_DEL, FORCE_OBJ_DEL -> unpackObjectDelete(operands)
+        FORCE_OBJ_DEL -> unpackObjectDelete(operands)
         OBJ_REQ -> unpackObjectRequest(operands)
         else -> {
             TODO("Operation $operation not yet implemented! $operationArray")
@@ -130,7 +128,7 @@ private fun unpackObjectDelete(operands: Value): OperationDto {
     val operand = operands.asNumberValue().toLong()
     val pointerDto = OperandDto.TensorPointerDto()
     pointerDto.id = operand
-    return OperationDto(OBJ_DEL, value = listOf((pointerDto)))
+    return OperationDto(FORCE_OBJ_DEL, value = listOf((pointerDto)))
 }
 
 fun unpackObjectRequest(operands: Value): OperationDto {
@@ -251,7 +249,7 @@ private fun mapOperation(operationDto: OperationDto): SyftMessage {
             )
             SyftMessage.ExecuteCommand(command)
         }
-        OBJ_DEL, FORCE_OBJ_DEL -> {
+        FORCE_OBJ_DEL -> {
             SyftMessage.DeleteObject((operationDto.value[0] as OperandDto.TensorPointerDto).id)
         }
         OBJ_REQ -> {
