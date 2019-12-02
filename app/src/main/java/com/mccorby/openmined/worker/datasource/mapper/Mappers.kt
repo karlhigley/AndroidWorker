@@ -119,7 +119,7 @@ private fun unpackOperation(operationArray: ArrayValue): OperationDto {
 }
 
 private fun unpackObjectSet(operands: Value): OperationDto {
-    val operandList = (operands as ArrayValue)[1].asArrayValue()
+    val operandList = (operands as ArrayValue)[0].asArrayValue()
     val data = unpackOperandByType(operandList)
     return OperationDto(OBJ, "", listOf(data))
 }
@@ -133,22 +133,23 @@ private fun unpackObjectDelete(operands: Value): OperationDto {
 
 fun unpackObjectRequest(operands: Value): OperationDto {
     // [3,77063181507]
-    val operand = operands.asArrayValue()[1].asNumberValue().toLong()
+    val operand = operands.asArrayValue()[0].asNumberValue().toLong()
     val pointerDto = OperandDto.TensorPointerDto()
     pointerDto.id = operand
     return OperationDto(OBJ_REQ, value = listOf((pointerDto)))
 }
 
 fun unpackCommand(operands: Value): OperationDto {
-    // At this point we should have a list with the form [2, [command, [first_operand][list of other operands]][return_ids]
+    // At this point we should have a list with the form
+    // [[6,[command, [first operand], [list of other operands]],[return ids]]
 
-    // [2,[[2,["__add__",[11,[9999,6830]],[2,[[11,[9999,1234]]]]]],[3,[7766]]]]
-    val operationComponents = operands.asArrayValue()[1].asArrayValue()
+    val operationComponents = operands.asArrayValue()
     val operation =
-        operationComponents[0].asArrayValue()[1].asArrayValue() // ["__add__",[11,[9999,6830]],[2,[[11,[9999,1234]]]]]
-    val returnIds = operationComponents[1].asArrayValue() // [3, [7766]]
+        operationComponents[0].asArrayValue()[1].asArrayValue()
+    val returnIds = operationComponents[1].asArrayValue()
 
-    return when (val command = unpackCommand(operation)) { // [18,["__add__"]]
+
+    return when (val command = unpackCommand(operation)) {
         CMD_ADD -> {
             val operationDto = OperationDto(op = CMD, command = command)
             val tensorList = mutableListOf<OperandDto>()
